@@ -5,8 +5,8 @@
 // Scale factor
 let sf = 20;
 
-// Starting point
-let starting_point;
+// Origin point
+let origin;
 
 /* ###################### */
 /* ### User Interface ### */
@@ -34,24 +34,31 @@ function setup() {
     λSlider.position(10, 40);
     λSlider.addClass('slider');
 
-    nSlider = createSlider(1, 10000, 1000, 250);
+    nSlider = createSlider(0, 10000, 1000, 100);
     nSlider.position(10, 70);
     nSlider.addClass('slider');
 
-    // Starting point
-    starting_point = createVector(0, 0);
+    // Origin point
+    origin = createVector(0, 0);
 }
 
 function draw() {
     background(0);
 
     // Sliders text
+    strokeWeight(1);
+    stroke(255);
     textSize(20);
     fill(255);
-    textAlign(CENTER, CENTER);
-    μText = text('μ', 250, 15);
-    λText = text('λ', 250, 50);
-    nText = text('n', 250, 80);
+    textAlign(LEFT, CENTER);
+    μText = text('μ = ' + μSlider.value(), 250, 15);
+    λText = text('λ = ' + λSlider.value(), 250, 50);
+    nText = text('n = ' + nSlider.value(), 250, 80);
+
+    if(dragging) {
+        origin.x = (mouseX - width / 2) / sf;
+        origin.y = (mouseY - height / 2) / sf;
+    }
 
     // Move draw point to screen center
     translate(width / 2, height / 2);
@@ -64,9 +71,14 @@ function draw() {
     stroke(124, 131, 253);
 
     // Draw shape
-    system(μSlider.value(), λSlider.value(), nSlider.value(), starting_point).forEach(
+    system(μSlider.value(), λSlider.value(), nSlider.value(), origin).forEach(
         p => point(p.x, p.y)
     );
+
+    // Draw origin point
+    strokeWeight(10 / sf);
+    stroke(253, 131, 124);
+    point(origin.x, origin.y);
 }
 
 /* ################ */
@@ -77,6 +89,20 @@ function draw() {
 window.addEventListener("wheel", e => {
     sf *= (e.deltaY < 0) ? 1.1 : 0.9;
 });
+
+// Draggable origin
+let dragging = false;
+
+function mousePressed() {
+    // Check if mouse is over the origin
+    if(dist(origin.x, origin.y, (mouseX - width / 2) / sf, (mouseY - height / 2) / sf) < 10) {
+        dragging = true;
+    }
+}
+
+function mouseReleased() {
+    dragging = false;
+}
 
 /* ######################## */
 /* ### Custom functions ### */
