@@ -17,6 +17,7 @@ let μSlider, λSlider, nSlider;
 
 // Text
 let μText, λText, nText;
+let originText;
 
 /* ####################### */
 /* ### P5.js functions ### */
@@ -51,14 +52,19 @@ function draw() {
     textSize(20);
     fill(255);
     textAlign(LEFT, CENTER);
+
     μText = text('μ = ' + μSlider.value(), 250, 15);
     λText = text('λ = ' + λSlider.value(), 250, 50);
     nText = text('n = ' + nSlider.value(), 250, 80);
 
+    // Drag origin
     if(dragging) {
         origin.x = (mouseX - width / 2) / sf;
         origin.y = (mouseY - height / 2) / sf;
     }
+
+    // Origin text
+    originText = text('O = [' + origin.x + ';' + origin.y + ']', 10, windowHeight - 20);
 
     // Move draw point to screen center
     translate(width / 2, height / 2);
@@ -95,7 +101,7 @@ let dragging = false;
 
 function mousePressed() {
     // Check if mouse is over the origin
-    if(dist(origin.x, origin.y, (mouseX - width / 2) / sf, (mouseY - height / 2) / sf) < 10) {
+    if(dist(origin.x, origin.y, (mouseX - width / 2) / sf, (mouseY - height / 2) / sf) < 10 / sf) {
         dragging = true;
     }
 }
