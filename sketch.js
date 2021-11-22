@@ -19,24 +19,26 @@ let μSlider, λSlider, nSlider;
 let μText, λText, nText;
 let originText;
 
+let NAV_HEIGHT = 40;
+
 /* ####################### */
 /* ### P5.js functions ### */
 /* ####################### */
 
 function setup() {
-    createCanvas(windowWidth, windowHeight);
+    createCanvas(windowWidth, windowHeight - NAV_HEIGHT);
 
     // Setup sliders
     μSlider = createSlider(0, 1, 0.5, 0.0001);
-    μSlider.position(10, 10);
+    μSlider.position(10, windowHeight - 70 - NAV_HEIGHT);
     μSlider.addClass('slider');
 
     λSlider = createSlider(0, 1, 0.5, 0.0001);
-    λSlider.position(10, 40);
+    λSlider.position(10, windowHeight - 40 - NAV_HEIGHT);
     λSlider.addClass('slider');
 
     nSlider = createSlider(0, 10000, 1000, 100);
-    nSlider.position(10, 70);
+    nSlider.position(10, windowHeight - 10 - NAV_HEIGHT);
     nSlider.addClass('slider');
 
     // Origin point
@@ -49,13 +51,13 @@ function draw() {
     // Sliders text
     strokeWeight(1);
     stroke(255);
-    textSize(20);
+    textSize(15);
     fill(255);
     textAlign(LEFT, CENTER);
 
-    μText = text('μ = ' + μSlider.value(), 250, 15);
-    λText = text('λ = ' + λSlider.value(), 250, 50);
-    nText = text('n = ' + nSlider.value(), 250, 80);
+    μText = text('μ = ' + μSlider.value(), 250, windowHeight - 100 - NAV_HEIGHT);
+    λText = text('λ = ' + λSlider.value(), 250, windowHeight - 70 - NAV_HEIGHT);
+    nText = text('n = ' + nSlider.value(), 250, windowHeight - 40 - NAV_HEIGHT);
 
     // Drag origin
     if(dragging) {
@@ -63,8 +65,7 @@ function draw() {
         origin.y = (mouseY - height / 2) / sf;
     }
 
-    // Origin text
-    originText = text('O = [' + origin.x + ';' + origin.y + ']', 10, windowHeight - 20);
+    push();
 
     // Move draw point to screen center
     translate(width / 2, height / 2);
@@ -74,7 +75,7 @@ function draw() {
     strokeWeight(3 / sf);
 
     // Color
-    stroke(124, 131, 253);
+    stroke('#05a8aaff');
 
     // Draw shape
     system(μSlider.value(), λSlider.value(), nSlider.value(), origin).forEach(
@@ -83,8 +84,21 @@ function draw() {
 
     // Draw origin point
     strokeWeight(10 / sf);
-    stroke(253, 131, 124);
+    stroke('#aa4465ff');
     point(origin.x, origin.y);
+
+    pop();
+
+    // Origin text
+    stroke('#aa4465ff');
+    fill('#aa4465ff');
+
+    originText = text(
+        'x : ' + origin.x + '\n' + 'y : ' + origin.y,
+        origin.x * sf + width / 2 + 15,
+        origin.y * sf + height / 2 - 10
+    );
+
 }
 
 /* ################ */

@@ -1,12 +1,57 @@
-html, body {
-  margin: 0;
-  padding: 0;
+/* ######## */
+/* # Font # */
+/* ######## */
+@import url('https://fonts.googleapis.com/css2?family=Encode+Sans:wght@500&display=swap');
+
+/* ################# */
+/* # Color palette # */
+/* ################# */
+:root {
+    --black: #000000ff;
+    --verdegris: #05a8aaff;
+    --pewter-blue: #87A0B2ff;
+    --irresistible: #aa4465ff;
+    --lapis-lazuli: #30638eff;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
 }
 
 canvas {
-  display: block;
+    display: block;
 }
 
 .slider {
     width: 200px;
+}
+
+/* ################## */
+/* # Navigation bar # */
+/* ################## */
+#menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+    background-color: var(--lapis-lazuli);
+    font-family: 'Encode Sans', sans-serif;
+    font-size: 15px;
+}
+
+#menu-heading {
+    margin-left: 10px;
+    font-size: 17px;
+}
+
+#menu-links>a {
+    margin: 0 10px 0 10px;
+    color: inherit;
+    text-decoration: none;
+}
+
+#menu-links:last-child {
+    margin-right: 20px;
 }
