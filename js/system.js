@@ -19,7 +19,7 @@ let μSlider, λSlider, nSlider;
 let μText, λText, nText;
 let originText;
 
-let NAV_HEIGHT = 40;
+const NAV_HEIGHT = 40;
 
 /* ####################### */
 /* ### P5.js functions ### */
@@ -29,11 +29,11 @@ function setup() {
     createCanvas(windowWidth, windowHeight - NAV_HEIGHT);
 
     // Setup sliders
-    μSlider = createSlider(0, 1, 0.5, 0.0001);
+    μSlider = createSlider(-1, 1, 0.5, 0.0001);
     μSlider.position(10, windowHeight - 70 - NAV_HEIGHT);
     μSlider.addClass('slider');
 
-    λSlider = createSlider(0, 1, 0.5, 0.0001);
+    λSlider = createSlider(-1, 1, 0.5, 0.0001);
     λSlider.position(10, windowHeight - 40 - NAV_HEIGHT);
     λSlider.addClass('slider');
 
@@ -127,15 +127,15 @@ function mouseReleased() {
     dragging = false;
 }
 
-/* ######################## */
-/* ### Custom functions ### */
-/* ######################## */
+/* ############## */
+/* ### System ### */
+/* ############## */
 
-function system(μ, λ, n, starting_point) {
+function system(μ, λ, n, startingPoint) {
     let points = [];
 
     // Starting point
-    let p = starting_point;
+    let p = startingPoint;
 
     // f(x)
     let f = (x, μ) => (μ * x) + (2 * (1 - μ) * x * x) / (1 - x + (x * x));
