@@ -3,7 +3,7 @@
 /* ######################## */
 
 // Scale factor
-let sf = 20;
+let sf = 32;
 
 // Origin point
 let origin;
@@ -49,10 +49,9 @@ function draw() {
     background(0);
 
     // Sliders text
-    strokeWeight(1);
-    stroke(255);
     textSize(15);
     fill(255);
+    textFont('Courier New');
     textAlign(LEFT, CENTER);
 
     μText = text('μ = ' + μSlider.value(), 250, windowHeight - 100 - NAV_HEIGHT);
@@ -72,10 +71,10 @@ function draw() {
 
     // Handle zoom
     scale(sf);
-    strokeWeight(3 / sf);
+    strokeWeight(4 / sf);
 
     // Color
-    stroke('#05a8aaff');
+    stroke('#f13030ff');
 
     // Draw shape
     system(μSlider.value(), λSlider.value(), nSlider.value(), origin).forEach(
@@ -84,21 +83,25 @@ function draw() {
 
     // Draw origin point
     strokeWeight(10 / sf);
-    stroke('#aa4465ff');
+    stroke('#0075ffff');
     point(origin.x, origin.y);
 
     pop();
 
     // Origin text
-    stroke('#aa4465ff');
-    fill('#aa4465ff');
-
     originText = text(
         'x : ' + origin.x + '\n' + 'y : ' + origin.y,
         origin.x * sf + width / 2 + 15,
         origin.y * sf + height / 2 - 10
     );
 
+    // Manage cursor
+    if (dist(origin.x, origin.y, (mouseX - width / 2) / sf, (mouseY - height / 2) / sf) < 10 / sf) {
+        cursor(HAND);
+    }
+    else {
+        cursor(ARROW);
+    }
 }
 
 /* ################ */
