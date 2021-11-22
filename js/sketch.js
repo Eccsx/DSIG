@@ -60,7 +60,7 @@ function draw() {
     nText = text('n = ' + nSlider.value(), 250, windowHeight - 40 - NAV_HEIGHT);
 
     // Drag origin
-    if(dragging) {
+    if (dragging) {
         origin.x = (mouseX - width / 2) / sf;
         origin.y = (mouseY - height / 2) / sf;
     }
@@ -115,7 +115,7 @@ let dragging = false;
 
 function mousePressed() {
     // Check if mouse is over the origin
-    if(dist(origin.x, origin.y, (mouseX - width / 2) / sf, (mouseY - height / 2) / sf) < 10 / sf) {
+    if (dist(origin.x, origin.y, (mouseX - width / 2) / sf, (mouseY - height / 2) / sf) < 10 / sf) {
         dragging = true;
     }
 }
