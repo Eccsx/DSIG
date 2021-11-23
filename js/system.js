@@ -143,7 +143,7 @@ function system(μ, λ, n, startingPoint) {
     // Iteration
     for (let i = 0; i < n; i++) {
         // Get new point
-        xn = p.y + (λ * (1 - 0.05 * p.x * p.x)) + f(p.x, μ);
+        xn = p.y + (λ * (1 - 0.05 * p.y * p.y)) + f(p.x, μ);
         yn = -p.x + f(xn, μ);
 
         // Store and set for next iteration
