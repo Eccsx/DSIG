@@ -98,8 +98,7 @@ function draw() {
     // Manage cursor
     if (dist(origin.x, origin.y, (mouseX - width / 2) / sf, (mouseY - height / 2) / sf) < 10 / sf) {
         cursor(HAND);
-    }
-    else {
+    } else {
         cursor(ARROW);
     }
 }
@@ -138,13 +137,13 @@ function system(μ, λ, n, startingPoint) {
     let p = startingPoint;
 
     // f(x)
-    let f = (x, μ) => (μ * x) + (2 * (1 - μ) * x * x) / (1 - x + (x * x));
+    let f = (x, μ) => (x * μ) + (2 * (1 - x) * μ * μ) / (1 - μ + (μ * μ));
 
     // Iteration
     for (let i = 0; i < n; i++) {
         // Get new point
-        xn = p.y + (λ * (1 - 0.05 * p.y * p.y)) + f(p.x, μ);
-        yn = -p.x + f(xn, μ);
+        xn = p.y + (λ * (1 - 0.05 * p.y * p.y) * p.y) + f(p.x, μ);
+        yn = f(xn, μ) - p.x;
 
         // Store and set for next iteration
         p = createVector(xn, yn);

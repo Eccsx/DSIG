@@ -47,10 +47,17 @@ function setup() {
 
 function draw() {
     // Genetic
-    bestSolution = genetic(100, 25, 20, CROSSOVER_PROBABILITY, MUTATION_PROBABILITY);
-    // bestSolution = new Chromosome(-0.48726236, 0.024799);
+    bestSolution = genetic(1000, 100, 2, CROSSOVER_PROBABILITY, MUTATION_PROBABILITY);
 
-    bestSolution.draw(100);
+    print(bestSolution);
+
+    background(0);
+    translate(width / 2, height / 2);
+    scale(sf);
+    strokeWeight(4 / sf);
+    stroke('#f13030ff');
+
+    bestSolution.draw(1000);
 
     // Statistics
     plotStatistics();
@@ -96,6 +103,8 @@ function genetic(populationSize, generationMax, numberElites, crossoverProbabili
         // New generation
         population = new Population(population, nextPopulation);
     }
+
+    print(population);
 
     // Best chromosome
     return population.elite();
@@ -253,7 +262,7 @@ class Chromosome {
     }
 
     fitness() {
-        return abs(FINAL_SOLUTION[0] - this.μ) + abs(FINAL_SOLUTION[1] - this.λ);
+        return dist(FINAL_SOLUTION[0], FINAL_SOLUTION[1], this.μ, this.λ);
     }
 
     crossover(c) {
@@ -274,26 +283,17 @@ class Chromosome {
             yn1 = 0;
 
         // f(x)
-        let f = (x) => (this.μ * x) + (2 * (1 - this.μ) * x * x) / (1 + (x * x));
+        let f = (x) => (x * this.μ) + (2 * (1 - x) * this.μ * this.μ) / (1 - this.μ + (this.μ * this.μ));
 
         for (let i = 0; i < pointLength; i++) {
             // Get next point
             let xn = yn1 + (this.λ * (1 - 0.05 * yn1 * yn1) * yn1) + f(xn1);
             let yn = f(xn) - xn1;
 
-            push();
-
-            background(0);
-            translate(width / 2, height / 2);
-            scale(sf);
-            strokeWeight(5 / sf);
-            stroke('#f13030ff');
-            point(xn, yn);
-
-            pop();
-
             xn1 = xn;
             yn1 = yn;
+
+            point(xn, yn);
         }
     }
 }
