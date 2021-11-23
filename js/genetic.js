@@ -47,7 +47,7 @@ function setup() {
 
 function draw() {
     // Genetic
-    bestSolution = genetic(100, 10, 20, CROSSOVER_PROBABILITY, MUTATION_PROBABILITY);
+    bestSolution = genetic(100, 25, 20, CROSSOVER_PROBABILITY, MUTATION_PROBABILITY);
     // bestSolution = new Chromosome(-0.48726236, 0.024799);
 
     bestSolution.draw(100);
@@ -308,7 +308,7 @@ function setupStatistics() {
     μCanvas = document.getElementById('μ-canvas');
     λCanvas = document.getElementById('λ-canvas');
 
-    // Set dimensions
+    // Dimensions
     fitnessCanvas.style.width = windowWidth / 2 + 'px';
     μCanvas.style.width = windowWidth / 4 + 'px';
     λCanvas.style.width = windowWidth / 4 + 'px';
@@ -316,9 +316,18 @@ function setupStatistics() {
     fitnessCanvas.style.height = (windowHeight / 2) - NAV_HEIGHT + 'px';
     μCanvas.style.height = (windowHeight / 2) + 'px';
     λCanvas.style.height = (windowHeight / 2) + 'px';
+
+    // Background color
+    fitnessCanvas.style.backgroundColor = 'black';
+    μCanvas.style.backgroundColor = 'black';
+    λCanvas.style.backgroundColor = 'black';
 }
 
 function plotStatistics() {
+    // Settings
+    Chart.defaults.font.size = 15;
+    Chart.defaults.color = 'white';
+
     // Fitness
     const fitnessChart = new Chart(fitnessCanvas.getContext('2d'), {
         type: 'line',
@@ -328,19 +337,22 @@ function plotStatistics() {
                     label: 'Best',
                     data: bestFitnessPerGeneration,
                     fill: false,
-                    borderColor: 'rgb(75, 192, 192)'
+                    borderColor: '#06d6a0',
+                    cubicInterpolationMode: 'monotone'
                 },
                 {
                     label: 'Mean',
                     data: meanFitnessPerGeneration,
                     fill: false,
-                    borderColor: 'rgb(192, 75, 192)'
+                    borderColor: '#ffd166',
+                    cubicInterpolationMode: 'monotone'
                 },
                 {
                     label: 'Worst',
                     data: worstFitnessPerGeneration,
                     fill: false,
-                    borderColor: 'rgb(192, 192, 75)'
+                    borderColor: '#ef476f',
+                    cubicInterpolationMode: 'monotone'
                 }
             ]
         },
@@ -369,19 +381,22 @@ function plotStatistics() {
                     label: 'Best',
                     data: bestμPerGeneration,
                     fill: false,
-                    borderColor: 'rgb(75, 192, 192)'
+                    borderColor: '#06d6a0',
+                    cubicInterpolationMode: 'monotone'
                 },
                 {
                     label: 'Mean',
                     data: meanμPerGeneration,
                     fill: false,
-                    borderColor: 'rgb(192, 75, 192)'
+                    borderColor: '#ffd166',
+                    cubicInterpolationMode: 'monotone'
                 },
                 {
                     label: 'Worst',
                     data: worstμPerGeneration,
                     fill: false,
-                    borderColor: 'rgb(192, 192, 75)'
+                    borderColor: '#ef476f',
+                    cubicInterpolationMode: 'monotone'
                 }
             ]
         },
@@ -410,19 +425,22 @@ function plotStatistics() {
                     label: 'Best',
                     data: bestλPerGeneration,
                     fill: false,
-                    borderColor: 'rgb(75, 192, 192)'
+                    borderColor: '#06d6a0',
+                    cubicInterpolationMode: 'monotone'
                 },
                 {
                     label: 'Mean',
                     data: meanλPerGeneration,
                     fill: false,
-                    borderColor: 'rgb(192, 75, 192)'
+                    borderColor: '#ffd166',
+                    cubicInterpolationMode: 'monotone'
                 },
                 {
                     label: 'Worst',
                     data: worstλPerGeneration,
                     fill: false,
-                    borderColor: 'rgb(192, 192, 75)'
+                    borderColor: '#ef476f',
+                    cubicInterpolationMode: 'monotone'
                 }
             ]
         },
