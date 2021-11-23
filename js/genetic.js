@@ -26,6 +26,8 @@ let λCanvas;
 
 let sf = 32; // Scale factor
 
+const chance = new Chance(Math.random); // Chance module to do weighted random
+
 /* ###################### */
 /* ### User Interface ### */
 /* ###################### */
@@ -42,15 +44,10 @@ function setup() {
 
     setupStatistics();
 
-    noLoop();
-}
-
-function draw() {
     // Genetic
-    bestSolution = genetic(1000, 100, 2, CROSSOVER_PROBABILITY, MUTATION_PROBABILITY);
+    bestSolution = genetic(150, 50, 2, CROSSOVER_PROBABILITY, MUTATION_PROBABILITY);
 
-    print(bestSolution);
-
+    // Drawing
     background(0);
     translate(width / 2, height / 2);
     scale(sf);
@@ -81,9 +78,10 @@ function genetic(populationSize, generationMax, numberElites, crossoverProbabili
 
         // Next population
         while (nextPopulation.length < populationSize) {
-            // Selection
-            let parent1 = population.chromosomes[floor(random(populationSize))];
-            let parent2 = population.chromosomes[floor(random(populationSize))];
+            // Selection along fitness
+            let weights = population.invertedFitness();
+            let parent1 = chance.weighted(population.chromosomes, weights);
+            let parent2 = chance.weighted(population.chromosomes, weights);
 
             // Crossover
             if (random() < crossoverProbability) {
@@ -104,8 +102,6 @@ function genetic(populationSize, generationMax, numberElites, crossoverProbabili
         population = new Population(population, nextPopulation);
     }
 
-    print(population);
-
     // Best chromosome
     return population.elite();
 }
@@ -121,11 +117,23 @@ class Population {
 
             // Generate population
             for (let i = 0; i < size; i++) {
-                this.chromosomes.push(new Chromosome(random(-100, 100), random(-100, 100)));
+                this.chromosomes.push(
+                    new Chromosome(random(-1, 1), random(-1, 1))
+                );
             }
         } else {
             this.chromosomes = chromosomes;
         }
+    }
+
+    invertedFitness() {
+        let inv = [];
+
+        this.chromosomes.forEach(chromosome => {
+            inv.push(1.0 / chromosome.fitness());
+        });
+
+        return inv;
     }
 
     elite() {
