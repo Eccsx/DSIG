@@ -18,7 +18,7 @@ let currentTrainingSamples = 1;
 const NN = new brain.NeuralNetwork();
 
 let prediction;
-let resultsCanvas, resultsChart = null;
+let resultsCanvas, resultsChart;
 
 /* ###################### */
 /* ### User Interface ### */
@@ -34,7 +34,7 @@ let storeMatrixButton;
 let guessNNButton;
 
 // Text element
-let matrixText = document.getElementById('pixel-matrix-text');
+let matrixText = document.getElementById('pixel-matrix-title');
 
 /* ####################### */
 /* ### P5.js functions ### */
@@ -42,21 +42,28 @@ let matrixText = document.getElementById('pixel-matrix-text');
 
 function setup() {
     const pixelMatrix = createCanvas(windowWidth / 3, windowWidth / 3);
-    pixelMatrix.parent('pixel-matrix-container');
+    pixelMatrix.parent('left-container');
     cursor(HAND);
 
     // Setup buttons
-    resetMatrixButton = createButton('Clear');
-    resetMatrixButton.position(0, NAV_HEIGHT + height + 50);
-    resetMatrixButton.mousePressed(clearDrawingMatrix);
-
-    storeMatrixButton = createButton('Submit');
-    storeMatrixButton.position(50, NAV_HEIGHT + height + 50);
+    storeMatrixButton = createButton('SUBMIT');
+    storeMatrixButton.parent('left-container')
+    storeMatrixButton.id('store-button');
     storeMatrixButton.mousePressed(storeDrawingMatrixData);
 
-    guessNNButton = createButton('Predict');
-    guessNNButton.position(250, NAV_HEIGHT + height + 50);
+    guessNNButton = createButton('GUESS');
+    guessNNButton.parent('left-container')
+    guessNNButton.id('guess-button');
     guessNNButton.mousePressed(predict);
+
+    resetMatrixButton = createButton('CLEAR');
+    resetMatrixButton.parent('left-container')
+    resetMatrixButton.id('reset-button');
+    resetMatrixButton.mousePressed(clearDrawingMatrix);
+
+
+
+
 
     initialization();
 }
@@ -69,7 +76,11 @@ function initialization() {
     clearDrawingMatrix();
 
     // Matrix text
-    matrixText.textContent = 'Training set --> "0" (1\/' + NUMBER_TRAINING_SAMPLES + ')';
+    matrixText.textContent = 'Training set ↤ { 0 } \n 1 of ' + NUMBER_TRAINING_SAMPLES;
+
+    // Plot statistics graph
+    setupStatistics();
+    plotStatistics();
 }
 
 /* ##################### */
@@ -85,7 +96,7 @@ function numberDrawingMatrix() {
     for (let line = 0; line < NUMBER_MATRIX_DIM['lines']; line++) {
         for (let column = 0; column < NUMBER_MATRIX_DIM['columns']; column++) {
             // Is the cell selected ?
-            fill(numberMatrix[line][column] === 1 ? 'red' : 'white');
+            fill(numberMatrix[line][column] === 1 ? '#47e5bc' : '#343a40');
 
             rect(
                 column * COLUMN_DIM,
@@ -144,15 +155,16 @@ function storeDrawingMatrixData() {
     }
 
     // Update matrix text
-    matrixText.textContent = 'Training set --> \'' + currentTrainingNumber + '\' (' + currentTrainingSamples + '\/' + NUMBER_TRAINING_SAMPLES + ')';
+    matrixText.textContent = 'Training set ↤ {' + currentTrainingNumber + '} ' + currentTrainingSamples + ' of ' + NUMBER_TRAINING_SAMPLES;
 
     // Check if training set is filled
     if (currentTrainingNumber === 10) {
         // Hide submit buttons
         storeMatrixButton.hide();
+        guessNNButton.show();
 
         // Update text
-        matrixText.textContent = 'Training set filled :)';
+        matrixText.textContent = 'Training fulfilled 😎';
 
         // Train neural network
         trainNN();
@@ -200,17 +212,9 @@ function predict() {
 
     prediction = NN.run(input);
 
-    // Plot results
-    if (resultsChart === null) {
-        // Create plot
-        setupStatistics();
-        plotStatistics();
-    } else {
-        // Update plot
-        resultsChart.data.datasets[0].data = Object.values(prediction);
-        resultsChart.update();
-    }
-
+    // Update statistics plot
+    resultsChart.data.datasets[0].data = Object.values(prediction);
+    resultsChart.update();
 }
 
 /* ################## */
@@ -222,8 +226,8 @@ function setupStatistics() {
     resultsCanvas = document.getElementById('nn-results-canvas');
 
     // Dimensions
-    resultsCanvas.style.width = 2 * windowWidth / 3 + 'px';
-    resultsCanvas.style.height = (windowHeight / 2) - NAV_HEIGHT + 'px';
+    resultsCanvas.style.width = 2 * windowWidth / 3 - 25 + 'px';
+    resultsCanvas.style.height = windowHeight - NAV_HEIGHT + 'px';
 
     // Background color
     resultsCanvas.style.backgroundColor = 'black';
@@ -241,7 +245,7 @@ function plotStatistics() {
             labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
             datasets: [{
                 label: 'NN',
-                data: Object.values(prediction),
+                data: [],
                 backgroundColor: '#06d6a0',
             }]
         },
