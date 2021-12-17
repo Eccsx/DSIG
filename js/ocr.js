@@ -2,18 +2,31 @@
 /* ### Global variables ### */
 /* ######################## */
 
-const NUMBER_GRID_DIM = {
-    "lines": 20,
-    "columns": 10
+const NUMBER_MATRIX_DIM = {
+    'lines': 10,
+    'columns': 10
 };
 
+const NUMBER_TRAINING_SAMPLES = 5;
+
 let numberMatrix = [];
+let trainingSet = [];
+
+let currentTrainingNumber = 0;
+let currentTrainingSamples = 1;
 
 /* ###################### */
 /* ### User Interface ### */
 /* ###################### */
 
 const NAV_HEIGHT = 40;
+
+// Training buttons
+let resetMatrixButton;
+let storeMatrixButton;
+
+// Text element
+let matrixText = document.getElementById('matrix-text');
 
 /* ####################### */
 /* ### P5.js functions ### */
@@ -22,36 +35,43 @@ const NAV_HEIGHT = 40;
 function setup() {
     const dim = (windowHeight - NAV_HEIGHT < windowWidth) ? windowHeight - NAV_HEIGHT : windowWidth;
     createCanvas(dim, dim);
+    cursor(HAND);
+
+    // Setup buttons
+    resetMatrixButton = createButton('Clear');
+    resetMatrixButton.position(0, NAV_HEIGHT + height);
+    resetMatrixButton.mousePressed(clearDrawingMatrix);
+
+    storeMatrixButton = createButton('Submit');
+    storeMatrixButton.position(50, NAV_HEIGHT + height);
+    storeMatrixButton.mousePressed(storeDrawingMatrixData);
 
     initialization();
 }
 
 function draw() {
-    numberDrawingGrid();
+    numberDrawingMatrix();
 }
 
 function initialization() {
-    // Matrix representation of number in grid
-    for (let line = 0; line < NUMBER_GRID_DIM["lines"]; line++) {
-        // Initialize cells with Os
-        numberMatrix.push(new Array(NUMBER_GRID_DIM["columns"]).fill(0));
-    }
+    clearDrawingMatrix();
 
-    console.log(numberMatrix)
+    // Matrix text
+    matrixText.textContent = 'Training set --> "0" (1\/' + NUMBER_TRAINING_SAMPLES + ')';
 }
 
-/* ################### */
-/* ### Number grid ### */
-/* ################### */
+/* ##################### */
+/* ### Number Matrix ### */
+/* ##################### */
 
-function numberDrawingGrid() {
+function numberDrawingMatrix() {
     // Dimensions
-    const LINE_DIM = width / NUMBER_GRID_DIM["lines"];
-    const COLUMN_DIM = height / NUMBER_GRID_DIM["columns"];
+    const LINE_DIM = width / NUMBER_MATRIX_DIM['lines'];
+    const COLUMN_DIM = height / NUMBER_MATRIX_DIM['columns'];
 
     // Display
-    for (let line = 0; line < NUMBER_GRID_DIM["lines"]; line++) {
-        for (let column = 0; column < NUMBER_GRID_DIM["columns"]; column++) {
+    for (let line = 0; line < NUMBER_MATRIX_DIM['lines']; line++) {
+        for (let column = 0; column < NUMBER_MATRIX_DIM['columns']; column++) {
             // Is the cell selected ?
             fill(numberMatrix[line][column] === 1 ? 'red' : 'white');
 
@@ -65,24 +85,83 @@ function numberDrawingGrid() {
     }
 }
 
+function clearDrawingMatrix() {
+    // Clear matrix
+    numberMatrix = [];
+
+    for (let line = 0; line < NUMBER_MATRIX_DIM['lines']; line++) {
+        // Initialize cells with Os
+        numberMatrix.push(new Array(NUMBER_MATRIX_DIM['columns']).fill(0));
+    }
+}
+
+function storeDrawingMatrixData() {
+    // Format matrix data
+    // https://stackoverflow.com/a/10865042/11060940
+    const data = [].concat.apply([], numberMatrix);
+
+    // Create training pattern
+    const tp = {
+        input: data,
+        output: {
+            0: int(currentTrainingNumber === 0),
+            1: int(currentTrainingNumber === 1),
+            2: int(currentTrainingNumber === 2),
+            3: int(currentTrainingNumber === 3),
+            4: int(currentTrainingNumber === 4),
+            5: int(currentTrainingNumber === 5),
+            6: int(currentTrainingNumber === 6),
+            7: int(currentTrainingNumber === 7),
+            8: int(currentTrainingNumber === 8),
+            9: int(currentTrainingNumber === 9)
+        }
+    };
+
+    // Store pattern
+    trainingSet.push(tp);
+
+    // Clear matrix
+    clearDrawingMatrix();
+
+    // Update training values
+    if (currentTrainingSamples === NUMBER_TRAINING_SAMPLES) {
+        currentTrainingNumber++;
+        currentTrainingSamples = 1;
+    } else {
+        currentTrainingSamples++;
+    }
+
+    // Update matrix text
+    matrixText.textContent = 'Training set --> \'' + currentTrainingNumber + '\' (' + currentTrainingSamples + '\/' + NUMBER_TRAINING_SAMPLES + ')';
+
+    // Check if training set is filled
+    if (currentTrainingNumber === 10) {
+        // Hide training buttons
+        resetMatrixButton.hide();
+        storeMatrixButton.hide();
+
+        matrixText.textContent = 'Training set filled :)';
+    }
+}
+
 /* ################ */
 /* ### Controls ### */
 /* ################ */
 
-// Draw number within the grid
+// Draw number within the matrix
 function mouseDragged() {
-    // Grid dimensions
-    const GRID_LINE_DIM = width / NUMBER_GRID_DIM["lines"];
-    const GRID_COLUMN_DIM = width / NUMBER_GRID_DIM["columns"];
+    // Matrix dimensions
+    const MATRIX_LINE_DIM = width / NUMBER_MATRIX_DIM['lines'];
+    const MATRIX_COLUMN_DIM = width / NUMBER_MATRIX_DIM['columns'];
 
     // Check if mouse is over a cell
-    for (let line = 0; line < NUMBER_GRID_DIM["lines"]; line++) {
-        for (let column = 0; column < NUMBER_GRID_DIM["columns"]; column++) {
+    for (let line = 0; line < NUMBER_MATRIX_DIM['lines']; line++) {
+        for (let column = 0; column < NUMBER_MATRIX_DIM['columns']; column++) {
             if (
-                mouseY > line * GRID_LINE_DIM &&
-                mouseY < line * GRID_LINE_DIM + GRID_LINE_DIM &&
-                mouseX > column * GRID_COLUMN_DIM &&
-                mouseX < column * GRID_COLUMN_DIM + GRID_COLUMN_DIM
+                mouseY > line * MATRIX_LINE_DIM &&
+                mouseY < line * MATRIX_LINE_DIM + MATRIX_LINE_DIM &&
+                mouseX > column * MATRIX_COLUMN_DIM &&
+                mouseX < column * MATRIX_COLUMN_DIM + MATRIX_COLUMN_DIM
             ) {
                 // Set cell to 1
                 numberMatrix[line][column] = 1;
@@ -90,18 +169,3 @@ function mouseDragged() {
         }
     }
 }
-
-
-// for (a = 0; a < width / 10; a++) {
-//     for (b = 0; b < height / 10; b++) {
-//         if (
-//             mouseX > a * width / 10 &&
-//             mouseX < a * width / 10 + width / 10 &&
-//             mouseY > b * width / 10 &&
-//             mouseY < b * width / 10 + width / 10
-//         ) {
-//             fill(255, 0, 0);
-//             rect(a * width / 10, b * height / 10, width / 10, height / 10);
-//         }
-//     }
-// }
