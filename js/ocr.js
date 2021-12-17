@@ -7,7 +7,7 @@ const NUMBER_MATRIX_DIM = {
     'columns': 10
 };
 
-const NUMBER_TRAINING_SAMPLES = 5;
+const NUMBER_TRAINING_SAMPLES = 2;
 
 let numberMatrix = [];
 let trainingSet = [];
@@ -16,6 +16,9 @@ let currentTrainingNumber = 0;
 let currentTrainingSamples = 1;
 
 const NN = new brain.NeuralNetwork();
+
+let prediction;
+let resultsCanvas, resultsChart = null;
 
 /* ###################### */
 /* ### User Interface ### */
@@ -31,15 +34,15 @@ let storeMatrixButton;
 let guessNNButton;
 
 // Text element
-let matrixText = document.getElementById('matrix-text');
+let matrixText = document.getElementById('pixel-matrix-text');
 
 /* ####################### */
 /* ### P5.js functions ### */
 /* ####################### */
 
 function setup() {
-    const dim = (windowHeight - NAV_HEIGHT < windowWidth) ? windowHeight - NAV_HEIGHT : windowWidth;
-    createCanvas(dim, dim);
+    const pixelMatrix = createCanvas(windowWidth / 3, windowWidth / 3);
+    pixelMatrix.parent('pixel-matrix-container');
     cursor(HAND);
 
     // Setup buttons
@@ -146,7 +149,7 @@ function storeDrawingMatrixData() {
     // Check if training set is filled
     if (currentTrainingNumber === 10) {
         // Hide submit buttons
-        resetMatrixButton.hide();
+        storeMatrixButton.hide();
 
         // Update text
         matrixText.textContent = 'Training set filled :)';
@@ -154,10 +157,6 @@ function storeDrawingMatrixData() {
         // Train neural network
         trainNN();
     }
-}
-
-function matrixDataToNNTrainingPattern() {
-
 }
 
 /* ################ */
@@ -199,7 +198,61 @@ function predict() {
     // https://stackoverflow.com/a/10865042/11060940
     const input = [].concat.apply([], numberMatrix);
 
-    const output = NN.run(input);
+    prediction = NN.run(input);
 
-    console.log(output);
+    // Plot results
+    if (resultsChart === null) {
+        // Create plot
+        setupStatistics();
+        plotStatistics();
+    } else {
+        // Update plot
+        resultsChart.data.datasets[0].data = Object.values(prediction);
+        resultsChart.update();
+    }
+
+}
+
+/* ################## */
+/* ### Statistics ### */
+/* ################## */
+
+function setupStatistics() {
+    // Retieve canvas element
+    resultsCanvas = document.getElementById('nn-results-canvas');
+
+    // Dimensions
+    resultsCanvas.style.width = 2 * windowWidth / 3 + 'px';
+    resultsCanvas.style.height = (windowHeight / 2) - NAV_HEIGHT + 'px';
+
+    // Background color
+    resultsCanvas.style.backgroundColor = 'black';
+}
+
+function plotStatistics() {
+    // Settings
+    Chart.defaults.font.size = 15;
+    Chart.defaults.color = 'white';
+
+    // Fitness
+    resultsChart = new Chart(resultsCanvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            datasets: [{
+                label: 'NN',
+                data: Object.values(prediction),
+                backgroundColor: '#06d6a0',
+            }]
+        },
+        options: {
+            responsive: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'NN results'
+                }
+            }
+        }
+    });
 }

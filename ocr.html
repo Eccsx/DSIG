@@ -9,6 +9,7 @@
     <link rel="stylesheet" type="text/css" href="css/ocr.css">
     <script src="libraries/p5.js"></script>
     <script src="libraries/brain.js"></script>
+    <script src="libraries/chart.js"></script>
 </head>
 
 <body>
@@ -23,7 +24,15 @@
         </div>
     </nav>
 
-    <div id="matrix-text"></div>
+    <div id="ocr-container">
+        <div id="pixel-matrix-container">
+            <div id="pixel-matrix-text"></div>
+        </div>
+        <div id="nn-results-container">
+            <div id="nn-prediction"></div>
+            <canvas id="nn-results-canvas"></canvas>
+        </div>
+    </div>
 
     <script src="js/ocr.js"></script>
 </body>
