@@ -15,6 +15,8 @@ let trainingSet = [];
 let currentTrainingNumber = 0;
 let currentTrainingSamples = 1;
 
+const NN = new brain.NeuralNetwork();
+
 /* ###################### */
 /* ### User Interface ### */
 /* ###################### */
@@ -24,6 +26,9 @@ const NAV_HEIGHT = 40;
 // Training buttons
 let resetMatrixButton;
 let storeMatrixButton;
+
+// NN button
+let guessNNButton;
 
 // Text element
 let matrixText = document.getElementById('matrix-text');
@@ -39,12 +44,16 @@ function setup() {
 
     // Setup buttons
     resetMatrixButton = createButton('Clear');
-    resetMatrixButton.position(0, NAV_HEIGHT + height);
+    resetMatrixButton.position(0, NAV_HEIGHT + height + 50);
     resetMatrixButton.mousePressed(clearDrawingMatrix);
 
     storeMatrixButton = createButton('Submit');
-    storeMatrixButton.position(50, NAV_HEIGHT + height);
+    storeMatrixButton.position(50, NAV_HEIGHT + height + 50);
     storeMatrixButton.mousePressed(storeDrawingMatrixData);
+
+    guessNNButton = createButton('Predict');
+    guessNNButton.position(250, NAV_HEIGHT + height + 50);
+    guessNNButton.mousePressed(predict);
 
     initialization();
 }
@@ -136,12 +145,19 @@ function storeDrawingMatrixData() {
 
     // Check if training set is filled
     if (currentTrainingNumber === 10) {
-        // Hide training buttons
+        // Hide submit buttons
         resetMatrixButton.hide();
-        storeMatrixButton.hide();
 
+        // Update text
         matrixText.textContent = 'Training set filled :)';
+
+        // Train neural network
+        trainNN();
     }
+}
+
+function matrixDataToNNTrainingPattern() {
+
 }
 
 /* ################ */
@@ -168,4 +184,22 @@ function mouseDragged() {
             }
         }
     }
+}
+
+/* ###################### */
+/* ### Neural network ### */
+/* ###################### */
+
+function trainNN() {
+    NN.train(trainingSet);
+}
+
+function predict() {
+    // Format matrix data
+    // https://stackoverflow.com/a/10865042/11060940
+    const input = [].concat.apply([], numberMatrix);
+
+    const output = NN.run(input);
+
+    console.log(output);
 }
