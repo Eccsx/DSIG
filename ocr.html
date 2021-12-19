@@ -6,8 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DSiG</title>
     <link rel="stylesheet" type="text/css" href="css/style.css">
-    <link rel="stylesheet" type="text/css" href="css/system.css">
+    <link rel="stylesheet" type="text/css" href="css/ocr.css">
     <script src="libraries/p5.js"></script>
+    <script src="libraries/brain.js"></script>
+    <script src="libraries/chart.js"></script>
 </head>
 
 <body>
@@ -16,13 +18,22 @@
             <h4>Dynamic Systems in Graphics</h4>
         </div>
         <div id="menu-links">
-            <a href="#">Gumowski-Mira System</a>
+            <a href="index.html">Gumowski-Mira System</a>
             <a href="genetic.html">Genetic Algorithm</a>
-            <a href="ocr.html">OCR</a>
+            <a href="#">OCR</a>
         </div>
     </nav>
 
-    <script src="js/system.js"></script>
+    <div id="ocr-container">
+        <div id="left-container">
+            <div id="pixel-matrix-title"></div>
+        </div>
+        <div id="nn-results-container">
+            <canvas id="nn-results-canvas"></canvas>
+        </div>
+    </div>
+
+    <script src="js/ocr.js"></script>
 </body>
 
 </html>
