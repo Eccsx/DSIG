@@ -3,8 +3,8 @@
 /* ######################## */
 
 const NUMBER_MATRIX_DIM = {
-    'lines': 10,
-    'columns': 10
+    'lines': 20,
+    'columns': 20
 };
 
 const NUMBER_TRAINING_SAMPLES = 5;
