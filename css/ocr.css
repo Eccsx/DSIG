@@ -47,3 +47,7 @@
 #guess-button {
     display: none;
 }
+
+button:hover {
+    cursor: pointer;
+}
