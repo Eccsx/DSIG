@@ -2,8 +2,7 @@
 /* ### Global variables ### */
 /* ######################## */
 
-let rosetteSideLength = 10;
-let tilingOrigin;
+let rosetteSideLength = 50;
 let b1 = 24, b2 = 5, b3 = 18, b4 = 50;
 
 /* ###################### */
@@ -19,27 +18,48 @@ const NAV_HEIGHT = 40;
 function setup() {
     createCanvas(windowWidth, windowHeight - NAV_HEIGHT);
     noLoop();
-
-    tilingOrigin = createVector(100, 100);
+    background(0);
 }
 
 function draw() {
-    background(0);
     stroke(255);
-    strokeWeight(3);
+    strokeWeight(1);
 
-    createRosette(rosetteSideLength, tilingOrigin, 4);
+    createTiling(rosetteSideLength, 6);
+}
+
+/* ############## */
+/* ### Tiling ### */
+/* ############## */
+
+function createTiling(sideLength, rosettePetalNumber) {
+    // Number of rosettes to fit canvas
+    const xTile = int(width / sideLength) + ( width % sideLength);
+    const yTile = int(height / sideLength) + ( height % sideLength);
+
+    console.log(xTile, yTile)
+
+    // Generate tiling pattern
+    for (let i = 0; i < xTile; i++) {
+        for (let j = 0; j < yTile; j++) {
+            // Rosette center
+            const center = createVector(
+                i * sideLength * 2,
+                j * sideLength * 2
+            );
+
+            createRosette(sideLength, center, rosettePetalNumber);
+        }
+    }
 }
 
 /* ############### */
 /* ### Rosette ### */
-/*################ */
+/* ############### */
 
 function createRosette(sideLength, center, petalNumber) {
     // Petal rotation angle
     const theta = 2 * PI / petalNumber;
-
-    console.log(theta)
 
     // Compute fundamental region's points
     let fundamentalRegionPoints = createFundamentalRegion(
@@ -56,7 +76,7 @@ function createRosette(sideLength, center, petalNumber) {
     let e = fundamentalRegionPoints[4];
 
     for (let i = 0; i < petalNumber; i++) {
-        console.log(a, b, c, d, e);
+        console.log('draw')
 
         // Draw petal
         line(a.x, a.y, b.x, b.y);
