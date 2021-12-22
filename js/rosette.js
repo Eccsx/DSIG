@@ -2,7 +2,7 @@
 /* ### Global variables ### */
 /* ######################## */
 
-let gap = 3;
+let gap = 2;
 
 /* ###################### */
 /* ### User Interface ### */
@@ -28,19 +28,19 @@ function setup() {
     petalSlider.position(10, windowHeight - 130 - NAV_HEIGHT);
     petalSlider.addClass('slider');
 
-    b1Slider = createSlider(0, 90, 0, 1);
+    b1Slider = createSlider(0, 45, 0, 1);
     b1Slider.position(10, windowHeight - 100 - NAV_HEIGHT);
     b1Slider.addClass('slider');
 
-    b2Slider = createSlider(0, 90, 33, 1);
+    b2Slider = createSlider(0, 45, 33, 1);
     b2Slider.position(10, windowHeight - 70 - NAV_HEIGHT);
     b2Slider.addClass('slider');
 
-    b3Slider = createSlider(0, 90, 15, 1);
+    b3Slider = createSlider(0, 45, 15, 1);
     b3Slider.position(10, windowHeight - 40 - NAV_HEIGHT);
     b3Slider.addClass('slider');
 
-    b4Slider = createSlider(0, 90, 60, 1);
+    b4Slider = createSlider(0, 45, 25, 1);
     b4Slider.position(10, windowHeight - 10 - NAV_HEIGHT);
     b4Slider.addClass('slider');
 }
@@ -81,10 +81,8 @@ function draw() {
 
 function createTiling(rosetteLength, rosettePetalNumber, b1, b2, b3, b4) {
     // Number of rosettes to fit canvas
-    const xTile = int(width / rosetteLength) + ( width % rosetteLength);
-    const yTile = int(height / rosetteLength) + ( height % rosetteLength);
-
-    console.log(xTile, yTile)
+    const xTile = int(width / rosetteLength) + (width % rosetteLength);
+    const yTile = int(height / rosetteLength) + (height % rosetteLength);
 
     // Generate tiling pattern
     for (let i = 0; i < xTile; i++) {
@@ -99,7 +97,9 @@ function createTiling(rosetteLength, rosettePetalNumber, b1, b2, b3, b4) {
                 rosetteLength,
                 center,
                 rosettePetalNumber,
-                b1, b2, b3, b4
+                b1, b2, b3, b4,
+                (i % 2 == 1) ? PI / 2 : 0, // Rotation angle for tiling
+                (j % 2 == 1) // Axial symmetry for tilling
             );
         }
     }
@@ -109,7 +109,14 @@ function createTiling(rosetteLength, rosettePetalNumber, b1, b2, b3, b4) {
 /* ### Rosette ### */
 /* ############### */
 
-function createRosette(sideLength, center, petalNumber, b1, b2, b3, b4) {
+function createRosette(
+    sideLength,
+    center,
+    petalNumber,
+    b1, b2, b3, b4,
+    θ,
+    isAxialSymmetry
+) {
     // Petal rotation angle
     const theta = 2 * PI / petalNumber;
 
@@ -127,6 +134,22 @@ function createRosette(sideLength, center, petalNumber, b1, b2, b3, b4) {
     let d = fundamentalRegionPoints[3];
     let e = fundamentalRegionPoints[4];
 
+    // Add θ angle
+    a = rotateSymmetry(a, center, θ);
+    b = rotateSymmetry(b, center, θ);
+    c = rotateSymmetry(c, center, θ);
+    d = rotateSymmetry(d, center, θ);
+    e = rotateSymmetry(e, center, θ);
+
+    // Check axial symmetry
+    if (isAxialSymmetry) {
+        a = axialSymmetry(a, center);
+        b = axialSymmetry(b, center);
+        c = axialSymmetry(c, center);
+        d = axialSymmetry(d, center);
+        e = axialSymmetry(e, center);
+    }
+
     for (let i = 0; i < petalNumber; i++) {
         console.log('draw')
 
@@ -143,6 +166,13 @@ function createRosette(sideLength, center, petalNumber, b1, b2, b3, b4) {
         d = rotateSymmetry(d, center, theta);
         e = rotateSymmetry(e, center, theta);
     }
+}
+
+function axialSymmetry(point, origin) {
+    return createVector(
+        point.x,
+        (2 * origin.y) - point.y
+    );
 }
 
 function rotateSymmetry(point, origin, θ) {
