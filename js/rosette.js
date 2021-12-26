@@ -2,19 +2,24 @@
 /* ### Global variables ### */
 /* ######################## */
 
-let gap = 2;
+const COLORS = [
+    '#fbf8cc',
+    '#fde4cf',
+    '#ffcfd2',
+    '#f1c0e8',
+    '#cfbaf0',
+    '#a3c4f3',
+    '#90dbf4',
+    '#8eecf5',
+    '#98f5e1',
+    '#b9fbc0'
+]
 
 /* ###################### */
 /* ### User Interface ### */
 /* ###################### */
 
 const NAV_HEIGHT = 40;
-
-// Sliders
-let lengthSlider, petalSlider, b1Slider, b2Slider, b3Slider, b4Slider;
-
-// Text
-let lengthText, petalText, b1Text, b2Text, b3Text, b4Text;
 
 /* ####################### */
 /* ### P5.js functions ### */
@@ -23,56 +28,20 @@ let lengthText, petalText, b1Text, b2Text, b3Text, b4Text;
 function setup() {
     createCanvas(windowWidth, windowHeight - NAV_HEIGHT);
 
-    // Setup sliders
-    petalSlider = createSlider(2, 10, 5, 1);
-    petalSlider.position(10, windowHeight - 130 - NAV_HEIGHT);
-    petalSlider.addClass('slider');
+    // Color superposition blending
+    blendMode(DIFFERENCE);
 
-    b1Slider = createSlider(0, 45, 0, 1);
-    b1Slider.position(10, windowHeight - 100 - NAV_HEIGHT);
-    b1Slider.addClass('slider');
-
-    b2Slider = createSlider(0, 45, 33, 1);
-    b2Slider.position(10, windowHeight - 70 - NAV_HEIGHT);
-    b2Slider.addClass('slider');
-
-    b3Slider = createSlider(0, 45, 15, 1);
-    b3Slider.position(10, windowHeight - 40 - NAV_HEIGHT);
-    b3Slider.addClass('slider');
-
-    b4Slider = createSlider(0, 45, 25, 1);
-    b4Slider.position(10, windowHeight - 10 - NAV_HEIGHT);
-    b4Slider.addClass('slider');
+    background(0);
+    noLoop();
 }
 
 function draw() {
-    background(0);
-
-    // Sliders text
-    textSize(15);
-    fill(255);
-    textFont('Courier New');
-    textAlign(LEFT, CENTER);
-
-    petalText = text('p = ' + petalSlider.value(), 250, windowHeight - 160 - NAV_HEIGHT);
-    b1Text = text('b1 = ' + b1Slider.value(), 250, windowHeight - 130 - NAV_HEIGHT);
-    b2Text = text('b2 = ' + b2Slider.value(), 250, windowHeight - 100 - NAV_HEIGHT);
-    b3Text = text('b3 = ' + b3Slider.value(), 250, windowHeight - 70 - NAV_HEIGHT);
-    b4Text = text('b4 = ' + b4Slider.value(), 250, windowHeight - 40 - NAV_HEIGHT);
-
-    push();
-
     // Tiling
-    stroke(255);
-    strokeWeight(1);
-
     createTiling(
         50,
-        petalSlider.value(),
-        b1Slider.value(), b2Slider.value(), b3Slider.value(), b4Slider.value()
+        7,
+        15, 15, 25, 15
     );
-
-    pop();
 }
 
 /* ############## */
@@ -84,24 +53,33 @@ function createTiling(rosetteLength, rosettePetalNumber, b1, b2, b3, b4) {
     const xTile = int(width / rosetteLength) + (width % rosetteLength);
     const yTile = int(height / rosetteLength) + (height % rosetteLength);
 
+    // Origin rosette
+    const rosette = new Rosette(
+        rosetteLength,
+        createVector(0, 0),
+        rosettePetalNumber,
+        b1, b2, b3, b4
+    );
+
     // Generate tiling pattern
     for (let i = 0; i < xTile; i++) {
-        for (let j = 0; j < yTile; j++) {
-            // Rosette center
-            const center = createVector(
-                i * rosetteLength * gap,
-                j * rosetteLength * gap
-            );
+        // Draw first column rosette
+        rosette.draw();
 
-            createRosette(
-                rosetteLength,
-                center,
-                rosettePetalNumber,
-                b1, b2, b3, b4,
-                (i % 2 == 1) ? PI / 2 : 0, // Rotation angle for tiling
-                (j % 2 == 1) // Axial symmetry for tilling
-            );
+        for (let j = 0; j < yTile; j++) {
+            if (i % 2 == 0) {
+                rosette.translateRight();
+            } else {
+                rosette.translateLeft();
+            }
+
+            rosette.axialSymmetryY();
+            rosette.draw();
         }
+
+        // Move rosette to next row
+        rosette.translateDown();
+        rosette.axialSymmetryX();
     }
 }
 
@@ -109,93 +87,159 @@ function createTiling(rosetteLength, rosettePetalNumber, b1, b2, b3, b4) {
 /* ### Rosette ### */
 /* ############### */
 
-function createRosette(
-    sideLength,
-    center,
-    petalNumber,
-    b1, b2, b3, b4,
-    θ,
-    isAxialSymmetry
-) {
-    // Petal rotation angle
-    const theta = 2 * PI / petalNumber;
-
-    // Compute fundamental region's points
-    let fundamentalRegionPoints = createFundamentalRegion(
+class Rosette {
+    constructor(
         sideLength,
-        center.x, center.y,
+        center,
+        petalNumber,
         b1, b2, b3, b4
-    );
+    ) {
+        this.center = center;
+        this.sideLength = sideLength;
+        this.petals = [];
 
-    // Compute rosette's points
-    let a = fundamentalRegionPoints[0];
-    let b = fundamentalRegionPoints[1];
-    let c = fundamentalRegionPoints[2];
-    let d = fundamentalRegionPoints[3];
-    let e = fundamentalRegionPoints[4];
+        // Fundamental region
+        const fundamentalRegionPoints = createFundamentalRegion(
+            sideLength,
+            center.x, center.y,
+            b1, b2, b3, b4
+        );
 
-    // Add θ angle
-    a = rotateSymmetry(a, center, θ);
-    b = rotateSymmetry(b, center, θ);
-    c = rotateSymmetry(c, center, θ);
-    d = rotateSymmetry(d, center, θ);
-    e = rotateSymmetry(e, center, θ);
+        // Rosette's petals
+        this.petals.push(fundamentalRegionPoints);
 
-    // Check axial symmetry
-    if (isAxialSymmetry) {
-        a = axialSymmetry(a, center);
-        b = axialSymmetry(b, center);
-        c = axialSymmetry(c, center);
-        d = axialSymmetry(d, center);
-        e = axialSymmetry(e, center);
+        // Petal rotation angle
+        const theta = 2 * PI / petalNumber;
+
+        // Compute petals
+        let a = fundamentalRegionPoints[0];
+        let b = fundamentalRegionPoints[1];
+        let c = fundamentalRegionPoints[2];
+        let d = fundamentalRegionPoints[3];
+        let e = fundamentalRegionPoints[4];
+
+        // Max x and y values to compute space between rosette tiles
+        this.maxX = max(a.x, b.x, c.x, d.x, e.x);
+        this.maxY = max(a.y, b.y, c.y, d.y, e.y);
+
+        for (let i = 0; i < petalNumber; i++) {
+            // Rotate points to next petal
+            a = rotationSymmetry(a, center, theta);
+            b = rotationSymmetry(b, center, theta);
+            c = rotationSymmetry(c, center, theta);
+            d = rotationSymmetry(d, center, theta);
+            e = rotationSymmetry(e, center, theta);
+
+            this.petals.push([a, b, c, d, e]);
+
+            // Update max values
+            this.maxX = max(this.maxX, max(a.x, b.x, c.x, d.x, e.x));
+            this.maxY = max(this.maxY, max(a.y, b.y, c.y, d.y, e.y));
+        }
+
+        // Max x and y values on center coordinates
+        this.maxX -= center.x;
+        this.maxY -= center.y;
+
+        // Dimension
+        this.maxRight = this.maxX;
+        this.maxLeft = -this.maxY; //+ abs(this.maxX - this.maxY);
     }
 
-    for (let i = 0; i < petalNumber; i++) {
-        console.log('draw')
+    translateLeft() {
+        this.center.x -= this.maxX * 2;
 
-        // Draw petal
-        line(a.x, a.y, b.x, b.y);
-        line(b.x, b.y, c.x, c.y);
-        line(c.x, c.y, d.x, d.y);
-        line(d.x, d.y, e.x, e.y);
+        this.petals.forEach(points => {
+            points.forEach(p => {
+                p.x -= this.maxX * 2;
+            });
+        });
+    }
 
-        // Rotate points to next petal
-        a = rotateSymmetry(a, center, theta);
-        b = rotateSymmetry(b, center, theta);
-        c = rotateSymmetry(c, center, theta);
-        d = rotateSymmetry(d, center, theta);
-        e = rotateSymmetry(e, center, theta);
+    translateRight() {
+        this.center.x += this.maxX * 2;
+
+        this.petals.forEach(points => {
+            points.forEach(p => {
+                p.x += this.maxX * 2;
+            });
+        });
+    }
+
+    translateDown() {
+        this.center.y += this.maxY * 2;
+
+        this.petals.forEach(points => {
+            points.forEach(p => {
+                p.y += this.maxY * 2;
+            });
+        });
+    }
+
+    axialSymmetryX() {
+        this.petals.forEach(points => {
+            points.forEach(p => {
+                p.y = (2 * this.center.y) - p.y;
+            });
+        });
+    }
+
+    axialSymmetryY() {
+        this.petals.forEach(points => {
+            points.forEach(p => {
+                p.x = (2 * this.center.x) - p.x;
+            });
+        });
+    }
+
+    draw() {
+        push();
+
+        // Line style
+        noStroke();
+        strokeWeight(1);
+
+        let petalIndex = 0;
+
+        this.petals.forEach(points => {
+            beginShape();
+
+            // Petal coloration
+            const c = color(COLORS[petalIndex++]);
+            fill(c);
+
+            points.forEach(p => {
+                vertex(p.x, p.y);
+            });
+
+            endShape(CLOSE);
+        });
+
+        pop();
+    }
+
+    drawBox() {
+        push();
+
+        strokeWeight(1)
+        stroke(255, 0, 0);
+        rectMode(CENTER);
+        noFill();
+
+        rect(
+            this.center.x,
+            this.center.y,
+            this.sideLength * 2,
+            this.sideLength * 2,
+        )
+
+        pop();
     }
 }
 
-function axialSymmetry(point, origin) {
-    return createVector(
-        point.x,
-        (2 * origin.y) - point.y
-    );
-}
-
-function rotateSymmetry(point, origin, θ) {
-    // Translate point to rotation's origin
-    let xTmp = point.x - origin.x;
-    let yTmp = -point.y + origin.y;
-
-    // Rotate point of θ angle
-    const pointR = rotateO(xTmp, yTmp, θ);
-
-    // Restore point offset from origin
-    return createVector(
-        pointR.x + origin.x,
-        -pointR.y + origin.y
-    );
-}
-
-function rotateO(x, y, θ) {
-    return createVector(
-        x * cos(θ) - y * sin(θ),
-        y * cos(θ) + x * sin(θ)
-    );
-}
+/* ########################## */
+/* ### Fundamental region ### */
+/* ########################## */
 
 function createFundamentalRegion(x, x0, y0, b1, b2, b3, b4) {
     // Fundamental region vertices
@@ -221,4 +265,26 @@ function createFundamentalRegion(x, x0, y0, b1, b2, b3, b4) {
     );
 
     return [a0, b0, c0, d0, e0];
+}
+
+/* ########################## */
+/* ### Rotation ### */
+/* ########################## */
+
+function rotationSymmetry(point, origin, theta) {
+    // Translate point to rotation's origin
+    let xTmp = point.x - origin.x;
+    let yTmp = -point.y + origin.y;
+
+    // Rotate point of theta angle
+    const pointR = createVector(
+        xTmp * cos(theta) - yTmp * sin(theta),
+        yTmp * cos(theta) + xTmp * sin(theta)
+    );
+
+    // Restore point offset from origin
+    return createVector(
+        pointR.x + origin.x,
+        -pointR.y + origin.y
+    );
 }
