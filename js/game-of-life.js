@@ -2,10 +2,12 @@
 /* ### Global variables ### */
 /* ######################## */
 
-const UNIVERSE_WIDTH = 6;
-const UNIVERSE_HEIGHT = 6;
+const UNIVERSE_WIDTH = 50;
+const UNIVERSE_HEIGHT = 50;
 
 let universe;
+
+let run = false;
 
 /* ###################### */
 /* ### User Interface ### */
@@ -20,12 +22,13 @@ const NAV_HEIGHT = 40;
 function setup() {
     createCanvas(500, 500);
     background(0);
-    noLoop();
+    frameRate(10);
+
+    universe = new Universe(UNIVERSE_WIDTH, UNIVERSE_HEIGHT, 0.3);
 }
 
 function draw() {
-    universe = new Universe(UNIVERSE_WIDTH, UNIVERSE_HEIGHT);
-    universe.show();
+    if (run) universe.nextGeneration();
 }
 
 /* ################ */
@@ -33,7 +36,7 @@ function draw() {
 /* ################ */
 
 class Universe {
-    constructor(dimX, dimY) {
+    constructor(dimX, dimY, lifeProbability) {
         this.dimX = dimX;
         this.dimY = dimY;
         this.cells = [];
@@ -41,9 +44,13 @@ class Universe {
         // Create cells
         for (let y = 0; y < this.dimY; y++) {
             for (let x = 0; x < this.dimX; x++) {
-                this.cells.push(new Cell(this, x, y, false))
+                const state = (Math.random() < lifeProbability);
+                this.cells.push(new Cell(this, x, y, state))
             }
         }
+
+        // Display universe
+        this.show();
     }
 
     getCell(x, y) {
