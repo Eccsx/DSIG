@@ -6,6 +6,7 @@
         "js/system.js",
         "js/genetic.js",
         "js/ocr.js",
-        "js/rosette.js"
+        "js/rosette.js",
+        "js/game-of-life.js"
     ]
 }
