@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIiCG</title>
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/game-of-life.css">
     <script src="libraries/p5.js"></script>
 </head>
 
@@ -22,6 +23,16 @@
             <a href="#">Game of Life</a>
         </div>
     </nav>
+
+    <div id="container">
+        <div id="universe-grid"></div>
+        <div id="action-container">
+            <p>p --> run / stop simulation</p>
+            <p>s --> save generation picture (only is simulation is paused)</p>
+            <p>+ --> increase simulation speed</p>
+            <p>- --> decrease simulation speed</p>
+        </div>
+    </div>
 
     <script src="js/game-of-life.js"></script>
 </body>

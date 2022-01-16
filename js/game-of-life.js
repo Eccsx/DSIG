@@ -8,6 +8,7 @@ const UNIVERSE_HEIGHT = 50;
 let universe;
 
 let run = false;
+let frameSpeed = 5;
 
 /* ###################### */
 /* ### User Interface ### */
@@ -20,9 +21,14 @@ const NAV_HEIGHT = 40;
 /* ####################### */
 
 function setup() {
-    createCanvas(500, 500);
+    const size = min(windowWidth, windowHeight - NAV_HEIGHT);
+    const grid = createCanvas(size, size);
+
+    grid.parent('universe-grid');
+    cursor(HAND);
+
     background(0);
-    frameRate(10);
+    frameRate(frameSpeed);
 
     universe = new Universe(UNIVERSE_WIDTH, UNIVERSE_HEIGHT, 0.3);
 }
@@ -59,7 +65,7 @@ class Universe {
 
 
     show() {
-        strokeWeight(0.5);
+        strokeWeight(0.2);
         for (let y = 0; y < this.dimY; y++) {
             for (let x = 0; x < this.dimX; x++) {
                 // Cell state
@@ -108,6 +114,14 @@ class Universe {
         // Update universe
         this.show();
     }
+
+    clear() {
+        this.cells.forEach(cell => {
+            cell.die();
+        });
+
+        this.show();
+    }
 }
 
 /* ############ */
@@ -150,10 +164,6 @@ class Cell {
         ];
     }
 
-    live() {
-        this.isAlive = true;
-    }
-
     die() {
         this.isAlive = false;
     }
@@ -167,25 +177,39 @@ class Cell {
 /* ### Controls ### */
 /* ################ */
 
-// Draw number within the matrix
 function mousePressed() {
-    // Matrix dimensions
-    const MATRIX_LINE_DIM = width / UNIVERSE_WIDTH;
-    const MATRIX_COLUMN_DIM = width / UNIVERSE_HEIGHT;
+    // Grid dimensions
+    const GRID_LINE_DIM = width / UNIVERSE_WIDTH;
+    const GRID_COLUMN_DIM = width / UNIVERSE_HEIGHT;
 
     // Check if mouse is over a cell
     for (let y = 0; y < UNIVERSE_WIDTH; y++) {
         for (let x = 0; x < UNIVERSE_HEIGHT; x++) {
             if (
-                mouseY > y * MATRIX_LINE_DIM &&
-                mouseY < y * MATRIX_LINE_DIM + MATRIX_LINE_DIM &&
-                mouseX > x * MATRIX_COLUMN_DIM &&
-                mouseX < x * MATRIX_COLUMN_DIM + MATRIX_COLUMN_DIM
+                mouseY > y * GRID_LINE_DIM &&
+                mouseY < y * GRID_LINE_DIM + GRID_LINE_DIM &&
+                mouseX > x * GRID_COLUMN_DIM &&
+                mouseX < x * GRID_COLUMN_DIM + GRID_COLUMN_DIM
             ) {
                 // Update cell state
                 universe.getCell(x, y).isAlive ^= true;
                 universe.show();
             }
         }
+    }
+}
+
+function keyPressed() {
+    if (key == 'p') {
+        run ^= true;
+    }
+    else if (key == 's' && !run) {
+        saveCanvas('simulation');
+    }
+    else if (key == '+') {
+        frameRate(++frameSpeed);
+    }
+    else if (key == '-') {
+        frameRate(--frameSpeed);
     }
 }

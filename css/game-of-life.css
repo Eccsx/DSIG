@@ -1,0 +1,7 @@
+#container {
+    display: flex;
+    font-size: 15px;
+    color: black;
+    font-family: 'Encode Sans', sans-serif;
+    font-weight: bold;
+}
