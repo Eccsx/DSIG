@@ -5,3 +5,11 @@
     font-family: 'Encode Sans', sans-serif;
     font-weight: bold;
 }
+
+#left-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#action-container {
+}
