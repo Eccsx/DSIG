@@ -2,13 +2,19 @@
 /* ### Global variables ### */
 /* ######################## */
 
-const UNIVERSE_WIDTH = 20;
-const UNIVERSE_HEIGHT = 20;
+const UNIVERSE_WIDTH = 80;
+const UNIVERSE_HEIGHT = 80;
+const UNIVERSE_LIFE_PROBABILITY = 0.15;
 
-let universe, coloredUniverse;
+let universe;
 
-let run = false;
-let frameSpeed = 5;
+let isRunning = false;
+let isColored = false;
+let frameSpeed = 20;
+
+const COLOR_SCALE = chroma.scale(['00f2f2', '0075f2']);
+const COLOR_LIGHTNESS_THRESHOLD = 0.1;
+const COLOR_FADE = 0.15;
 
 /* ###################### */
 /* ### User Interface ### */
@@ -17,113 +23,95 @@ let frameSpeed = 5;
 const NAV_HEIGHT = 40;
 
 /* ####################### */
-/* ### P5.js functions ### */
+/* ### js functions ### */
 /* ####################### */
 
-// Classic universe
-new p5(function (p5) {
-    p5.setup = function () {
-        const size = p5.min(p5.windowWidth, p5.windowHeight - NAV_HEIGHT);
-        const classic = p5.createCanvas(size, size);
+function setup() {
+    const size = min(windowWidth, windowHeight - NAV_HEIGHT);
+    const classic = createCanvas(size, size);
 
-        classic.parent('universe-grid');
-        p5.cursor(p5.HAND);
+    classic.parent('universe-grid');
+    cursor(HAND);
 
-        p5.background(0);
-        p5.frameRate(frameSpeed);
+    background(0);
+    noStroke();
+    frameRate(frameSpeed);
 
-        universe = new Universe(UNIVERSE_WIDTH, UNIVERSE_HEIGHT, 0.3);
-    }
+    universe = new Universe(UNIVERSE_WIDTH, UNIVERSE_HEIGHT);
+}
 
-    p5.draw = function () {
-        if (run) universe.nextGeneration();
-        universe.show(p5);
-    }
+function draw() {
+    if (isRunning) universe.nextGeneration();
+    universe.show(isColored);
+}
 
-    p5.mousePressed = function () {
-        // Grid dimensions
-        const GRID_LINE_DIM = p5.width / UNIVERSE_WIDTH;
-        const GRID_COLUMN_DIM = p5.width / UNIVERSE_HEIGHT;
+/* ################ */
+/* ### Controls ### */
+/* ################ */
 
-        // Check if mouse is over a cell
-        for (let y = 0; y < UNIVERSE_WIDTH; y++) {
-            for (let x = 0; x < UNIVERSE_HEIGHT; x++) {
-                if (
-                    p5.mouseY > y * GRID_LINE_DIM &&
-                    p5.mouseY < y * GRID_LINE_DIM + GRID_LINE_DIM &&
-                    p5.mouseX > x * GRID_COLUMN_DIM &&
-                    p5.mouseX < x * GRID_COLUMN_DIM + GRID_COLUMN_DIM
-                ) {
-                    // Update cell state
-                    const cell = universe.getCell(x, y);
-                    cell.isAlive ^= true;
+function mousePressed() {
+    // Grid dimensions
+    const GRID_LINE_DIM = width / UNIVERSE_WIDTH;
+    const GRID_COLUMN_DIM = width / UNIVERSE_HEIGHT;
 
-                    // Update color
-                    cell.color = cell.isAlive ? chroma.random().hex() : chroma('white').hex();
+    // Check if mouse is over a cell
+    for (let y = 0; y < UNIVERSE_WIDTH; y++) {
+        for (let x = 0; x < UNIVERSE_HEIGHT; x++) {
+            if (
+                mouseY > y * GRID_LINE_DIM &&
+                mouseY < y * GRID_LINE_DIM + GRID_LINE_DIM &&
+                mouseX > x * GRID_COLUMN_DIM &&
+                mouseX < x * GRID_COLUMN_DIM + GRID_COLUMN_DIM
+            ) {
+                // Update cell state
+                const cell = universe.getCell(x, y);
+                cell.isAlive ^= true;
 
-                    universe.show(p5);
+                // Update color
+                if (cell.isAlive) {
+                    // Assign a random color within the scale
+                    cell.color = COLOR_SCALE(Math.random()).hex();
+                } else {
+                    // Delete into black
+                    cell.color = chroma('black').hex();
                 }
+
+                universe.show();
             }
         }
     }
+}
 
-    p5.keyPressed = function () {
-        if (p5.key == 'p') {
-            run ^= true;
-        } else if (p5.key == 's' && !run) {
-            p5.saveCanvas('simulation');
-        } else if (p5.key == '+') {
-            p5.frameRate(++frameSpeed);
-        } else if (p5.key == '-') {
-            p5.frameRate(--frameSpeed);
-        }
+function keyPressed() {
+    if (key == 'p') {
+        isRunning ^= true;
+    } else if (key == 's' && !isRunning) {
+        saveCanvas('simulation');
+    } else if (key == '+') {
+        if (frameSpeed < 60) frameRate(++frameSpeed);
+    } else if (key == '-') {
+        if (frameSpeed > 1) frameRate(--frameSpeed);
+    } else if (key == 'c') {
+        isColored ^= true;
+    } else if (key == 'd') {
+        universe.clear();
     }
-});
-
-// Colored universe
-new p5(function (p5) {
-    p5.setup = function () {
-        const size = p5.min(p5.windowWidth, p5.windowHeight - NAV_HEIGHT);
-        const colored = p5.createCanvas(
-            p5.windowWidth - size,
-            p5.windowWidth - size
-        );
-
-        colored.parent('colored-universe-grid');
-        p5.cursor(p5.HAND);
-
-        p5.background(0);
-        p5.frameRate(frameSpeed);
+    else if (key == 'r') {
+        universe.random(UNIVERSE_LIFE_PROBABILITY);
     }
-
-    p5.draw = function () {
-        universe.show(p5, colorize = true);
-    }
-});
-
+}
 
 /* ################ */
 /* ### Universe ### */
 /* ################ */
 
 class Universe {
-    constructor(dimX, dimY, lifeProbability) {
+    constructor(dimX, dimY) {
         this.dimX = dimX;
         this.dimY = dimY;
-        this.cells = [];
 
         // Create cells
-        for (let y = 0; y < this.dimY; y++) {
-            for (let x = 0; x < this.dimX; x++) {
-                const state = (Math.random() < lifeProbability);
-                this.cells.push(
-                    new Cell(
-                        this, x, y, state,
-                        state ? chroma.random().hex() : chroma('white').hex()
-                    )
-                );
-            }
-        }
+        this.random(UNIVERSE_LIFE_PROBABILITY);
     }
 
     getCell(x, y) {
@@ -131,8 +119,7 @@ class Universe {
     }
 
 
-    show(p5, colorize = false) {
-        p5.strokeWeight(0.2);
+    show(colorize = false) {
         for (let y = 0; y < this.dimY; y++) {
             for (let x = 0; x < this.dimX; x++) {
                 // Current cell
@@ -141,16 +128,16 @@ class Universe {
 
                 // Color
                 if (colorize) {
-                    p5.fill(cellColor);
+                    fill(cellColor);
                 } else {
-                    p5.fill(cell.isAlive ? 'black' : 'white');
+                    fill(cell.isAlive ? 'white' : 'black');
                 }
 
-                p5.rect(
-                    x * (p5.width / this.dimX),
-                    y * (p5.height / this.dimY),
-                    p5.width / this.dimX,
-                    p5.height / this.dimY
+                rect(
+                    x * (width / this.dimX),
+                    y * (height / this.dimY),
+                    width / this.dimX,
+                    height / this.dimY
                 );
             }
         }
@@ -181,20 +168,23 @@ class Universe {
             }
 
             // Next cell color
-            let nextColor = color;
+            let nextColor;
             if (alive && nextState) {
-                // A cell who is still alive average its color with the ones of its live neighbours
+                // A cell who is alive average its color with the ones of its live neighbours
                 nextColor = chroma.average(aliveNeighboursColors).hex();
-            }
-            else if (!alive && nextState) {
-                // A cell who's born get assign a random color
-                nextColor = chroma.random().hex();
-            }
-            else {
-                nextColor = chroma('white').hex();
+            } else if (!alive && nextState) {
+                // A cell who is born get assign a random color within the scale
+                nextColor = COLOR_SCALE(Math.random()).hex();
+            } else {
+                // The color of a dead cell will fade away until a reach a threshold
+                nextColor = chroma(color).darken(COLOR_FADE).hex();
+
+                if (chroma(color).hsl()[2] < COLOR_LIGHTNESS_THRESHOLD) {
+                    nextColor = color;
+                }
             }
 
-            // Create newt generation cell
+            // Create next generation cell
             nextGen.push(new Cell(this, x, y, nextState, nextColor))
         });
 
@@ -203,11 +193,25 @@ class Universe {
     }
 
     clear() {
-        this.cells.forEach(cell => {
-            cell.die();
-        });
+        this.random(0);
+        isRunning = false;
+    }
 
-        this.show();
+    random(lifeProbability) {
+        // Clear cells
+        this.cells = [];
+
+        for (let y = 0; y < this.dimY; y++) {
+            for (let x = 0; x < this.dimX; x++) {
+                const isAlive = Math.random() < lifeProbability;
+                this.cells.push(
+                    new Cell(
+                        this, x, y, isAlive,
+                        isAlive ? COLOR_SCALE(Math.random()).hex() : chroma('black').hex()
+                    )
+                );
+            }
+        }
     }
 }
 
