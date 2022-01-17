@@ -1,15 +1,8 @@
-#container {
-    display: flex;
+#action-container {
     font-size: 15px;
     color: black;
     font-family: 'Encode Sans', sans-serif;
     font-weight: bold;
-}
 
-#left-container {
-    display: flex;
-    flex-direction: column;
-}
-
-#action-container {
+    display: none;
 }

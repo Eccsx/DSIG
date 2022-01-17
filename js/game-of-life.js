@@ -2,15 +2,15 @@
 /* ### Global variables ### */
 /* ######################## */
 
-const UNIVERSE_WIDTH = 80;
-const UNIVERSE_HEIGHT = 80;
-const UNIVERSE_LIFE_PROBABILITY = 0.15;
+const CELL_SIZE = 20;
+const UNIVERSE_LIFE_PROBABILITY = 0.1;
 
 let universe;
+let universeWidth, universeHeight;
 
 let isRunning = false;
 let isColored = false;
-let frameSpeed = 20;
+let frameSpeed = 10;
 
 const COLOR_SCALE = chroma.scale(['00f2f2', '0075f2']);
 const COLOR_LIGHTNESS_THRESHOLD = 0.1;
@@ -23,21 +23,22 @@ const COLOR_FADE = 0.15;
 const NAV_HEIGHT = 40;
 
 /* ####################### */
-/* ### js functions ### */
+/* ### P5 js functions ### */
 /* ####################### */
 
 function setup() {
-    const size = min(windowWidth, windowHeight - NAV_HEIGHT);
-    const classic = createCanvas(size, size);
-
-    classic.parent('universe-grid');
+    const life = createCanvas(windowWidth, windowHeight - NAV_HEIGHT)
+    life.parent('universe-grid');
     cursor(HAND);
 
     background(0);
     noStroke();
     frameRate(frameSpeed);
 
-    universe = new Universe(UNIVERSE_WIDTH, UNIVERSE_HEIGHT);
+    // Create universe
+    universeWidth = Math.floor(width / CELL_SIZE);
+    universeHeight = Math.floor(height / CELL_SIZE);
+    universe = new Universe(universeWidth, universeHeight);
 }
 
 function draw() {
@@ -51,12 +52,12 @@ function draw() {
 
 function mousePressed() {
     // Grid dimensions
-    const GRID_LINE_DIM = width / UNIVERSE_WIDTH;
-    const GRID_COLUMN_DIM = width / UNIVERSE_HEIGHT;
+    const GRID_LINE_DIM = width / universeWidth;
+    const GRID_COLUMN_DIM = height / universeHeight;
 
     // Check if mouse is over a cell
-    for (let y = 0; y < UNIVERSE_WIDTH; y++) {
-        for (let x = 0; x < UNIVERSE_HEIGHT; x++) {
+    for (let y = 0; y < universeWidth; y++) {
+        for (let x = 0; x < universeHeight; x++) {
             if (
                 mouseY > y * GRID_LINE_DIM &&
                 mouseY < y * GRID_LINE_DIM + GRID_LINE_DIM &&
@@ -95,8 +96,7 @@ function keyPressed() {
         isColored ^= true;
     } else if (key == 'd') {
         universe.clear();
-    }
-    else if (key == 'r') {
+    } else if (key == 'r') {
         universe.random(UNIVERSE_LIFE_PROBABILITY);
     }
 }
