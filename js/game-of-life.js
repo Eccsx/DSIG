@@ -3,7 +3,7 @@
 /* ######################## */
 
 const CELL_SIZE = 15;
-const UNIVERSE_LIFE_PROBABILITY = 0.3;
+const UNIVERSE_LIFE_PROBABILITY = 0.5;
 
 let universe;
 let universeWidth, universeHeight;
@@ -12,8 +12,8 @@ let isRunning = false;
 let isColored = false;
 let frameSpeed = 8;
 
-const COLOR_SCALE = chroma.scale(['00f2f2', '0075f2']);
-const COLOR_LIGHTNESS_THRESHOLD = 0.1;
+const COLOR_SCALE = chroma.scale(['2d82b7', '42e2b8']);
+const COLOR_LIGHTNESS_THRESHOLD = 0.05;
 const COLOR_FADE = 0.15;
 
 /* ###################### */
