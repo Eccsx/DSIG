@@ -2,7 +2,7 @@
 /* ### Global variables ### */
 /* ######################## */
 
-const CELL_SIZE = 25;
+const CELL_SIZE = 15;
 const UNIVERSE_LIFE_PROBABILITY = 0.3;
 
 let universe;
@@ -53,12 +53,12 @@ function draw() {
 function mousePressed() {
     if (mouseButton == LEFT) {
         // Grid dimensions
-        const GRID_LINE_DIM = width / universeWidth;
-        const GRID_COLUMN_DIM = height / universeHeight;
+        const GRID_LINE_DIM = height / universeHeight;
+        const GRID_COLUMN_DIM = width / universeWidth;
 
         // Check if mouse is over a cell
-        for (let y = 0; y < universeWidth; y++) {
-            for (let x = 0; x < universeHeight; x++) {
+        for (let y = 0; y < universeHeight; y++) {
+            for (let x = 0; x < universeWidth; x++) {
                 if (
                     mouseY > y * GRID_LINE_DIM &&
                     mouseY < y * GRID_LINE_DIM + GRID_LINE_DIM &&
