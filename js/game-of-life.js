@@ -2,15 +2,15 @@
 /* ### Global variables ### */
 /* ######################## */
 
-const CELL_SIZE = 20;
-const UNIVERSE_LIFE_PROBABILITY = 0.1;
+const CELL_SIZE = 25;
+const UNIVERSE_LIFE_PROBABILITY = 0.3;
 
 let universe;
 let universeWidth, universeHeight;
 
 let isRunning = false;
 let isColored = false;
-let frameSpeed = 10;
+let frameSpeed = 8;
 
 const COLOR_SCALE = chroma.scale(['00f2f2', '0075f2']);
 const COLOR_LIGHTNESS_THRESHOLD = 0.1;
@@ -51,33 +51,35 @@ function draw() {
 /* ################ */
 
 function mousePressed() {
-    // Grid dimensions
-    const GRID_LINE_DIM = width / universeWidth;
-    const GRID_COLUMN_DIM = height / universeHeight;
+    if (mouseButton == LEFT) {
+        // Grid dimensions
+        const GRID_LINE_DIM = width / universeWidth;
+        const GRID_COLUMN_DIM = height / universeHeight;
 
-    // Check if mouse is over a cell
-    for (let y = 0; y < universeWidth; y++) {
-        for (let x = 0; x < universeHeight; x++) {
-            if (
-                mouseY > y * GRID_LINE_DIM &&
-                mouseY < y * GRID_LINE_DIM + GRID_LINE_DIM &&
-                mouseX > x * GRID_COLUMN_DIM &&
-                mouseX < x * GRID_COLUMN_DIM + GRID_COLUMN_DIM
-            ) {
-                // Update cell state
-                const cell = universe.getCell(x, y);
-                cell.isAlive ^= true;
+        // Check if mouse is over a cell
+        for (let y = 0; y < universeWidth; y++) {
+            for (let x = 0; x < universeHeight; x++) {
+                if (
+                    mouseY > y * GRID_LINE_DIM &&
+                    mouseY < y * GRID_LINE_DIM + GRID_LINE_DIM &&
+                    mouseX > x * GRID_COLUMN_DIM &&
+                    mouseX < x * GRID_COLUMN_DIM + GRID_COLUMN_DIM
+                ) {
+                    // Update cell state
+                    const cell = universe.getCell(x, y);
+                    cell.isAlive ^= true;
 
-                // Update color
-                if (cell.isAlive) {
-                    // Assign a random color within the scale
-                    cell.color = COLOR_SCALE(Math.random()).hex();
-                } else {
-                    // Delete into black
-                    cell.color = chroma('black').hex();
+                    // Update color
+                    if (cell.isAlive) {
+                        // Assign a random color within the scale
+                        cell.color = COLOR_SCALE(Math.random()).hex();
+                    } else {
+                        // Delete into black
+                        cell.color = chroma('black').hex();
+                    }
+
+                    universe.show();
                 }
-
-                universe.show();
             }
         }
     }
@@ -87,7 +89,7 @@ function keyPressed() {
     if (key == 'p') {
         isRunning ^= true;
     } else if (key == 's' && !isRunning) {
-        saveCanvas('simulation');
+        saveCanvas(universe.getStateTitle());
     } else if (key == '+') {
         if (frameSpeed < 60) frameRate(++frameSpeed);
     } else if (key == '-') {
@@ -109,9 +111,11 @@ class Universe {
     constructor(dimX, dimY) {
         this.dimX = dimX;
         this.dimY = dimY;
+        this.generation = 0;
 
         // Create cells
         this.random(UNIVERSE_LIFE_PROBABILITY);
+
     }
 
     getCell(x, y) {
@@ -190,6 +194,7 @@ class Universe {
 
         // Save next generation
         this.cells = nextGen;
+        this.generation++;
     }
 
     clear() {
@@ -212,6 +217,32 @@ class Universe {
                 );
             }
         }
+
+        this.generation = 0;
+        this.generateHashId();
+    }
+
+    generateHashId() {
+        this.id = '';
+
+        // Retrieved cells state
+        this.cells.forEach(cell => {
+            this.id += cell.isAlive ? '1' : '0';
+        });
+
+        // Hash
+        // https://blog.trannhat.xyz/generate-a-hash-from-string-in-javascript/
+        const hashCode = s => s.split('').reduce((a, b) => {
+            a = ((a << 5) - a) + b.charCodeAt(0);
+            return a & a;
+        }, 0);
+
+        this.id = hashCode(this.id);
+    }
+
+    // Does not take into accoutn modification due to mouse presses
+    getStateTitle() {
+        return 'S' + this.id + 'G' + this.generation + 'C' + (isColored ? '1' : '0');
     }
 }
 
