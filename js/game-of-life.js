@@ -2,19 +2,26 @@
 /* ### Global variables ### */
 /* ######################## */
 
-const CELL_SIZE = 15;
-const UNIVERSE_LIFE_PROBABILITY = 0.5;
+const CELL_SIZE = 20;
+const UNIVERSE_LIFE_PROBABILITY = 0.3;
 
 let universe;
 let universeWidth, universeHeight;
-
-let isRunning = false;
-let isColored = false;
 let frameSpeed = 8;
+let isRunning = false;
+
+const COLOR_MODE = {
+    'BLACK_AND_WHITE': 0,
+    'COLOR': 1,
+    'HEATMAP': 2
+};
+let mode = 0;
 
 const COLOR_SCALE = chroma.scale(['2d82b7', '42e2b8']);
 const COLOR_LIGHTNESS_THRESHOLD = 0.05;
 const COLOR_FADE = 0.15;
+
+const HEATMAP_SCALE = chroma.scale(['black', 'purple', 'red', 'ivory']);
 
 /* ###################### */
 /* ### User Interface ### */
@@ -43,7 +50,7 @@ function setup() {
 
 function draw() {
     if (isRunning) universe.nextGeneration();
-    universe.show(isColored);
+    universe.show(mode);
 }
 
 /* ################ */
@@ -73,9 +80,11 @@ function mousePressed() {
                     if (cell.isAlive) {
                         // Assign a random color within the scale
                         cell.color = COLOR_SCALE(Math.random()).hex();
+                        cell.occurence = 1;
                     } else {
                         // Delete into black
                         cell.color = chroma('black').hex();
+                        cell.occurence = 0;
                     }
 
                     universe.show();
@@ -94,8 +103,12 @@ function keyPressed() {
         if (frameSpeed < 60) frameRate(++frameSpeed);
     } else if (key == '-') {
         if (frameSpeed > 1) frameRate(--frameSpeed);
+    } else if (key == 'b') {
+        mode = COLOR_MODE.BLACK_AND_WHITE;
+    } else if (key == 'h') {
+        mode = COLOR_MODE.HEATMAP;
     } else if (key == 'c') {
-        isColored ^= true;
+        mode = COLOR_MODE.COLOR;
     } else if (key == 'd') {
         universe.clear();
     } else if (key == 'r') {
@@ -116,25 +129,44 @@ class Universe {
         // Create cells
         this.random(UNIVERSE_LIFE_PROBABILITY);
 
+        this.maxCellOcurrence = this.getMaxCellOccurence();
     }
 
     getCell(x, y) {
         return this.cells[y * this.dimX + x];
     }
 
-
-    show(colorize = false) {
+    show(colorMode) {
         for (let y = 0; y < this.dimY; y++) {
             for (let x = 0; x < this.dimX; x++) {
                 // Current cell
                 const cell = this.getCell(x, y);
                 const cellColor = cell.color;
+                const cellOccurence = cell.occurence;
 
                 // Color
-                if (colorize) {
-                    fill(cellColor);
-                } else {
-                    fill(cell.isAlive ? 'white' : 'black');
+                switch (colorMode) {
+                    case COLOR_MODE.BLACK_AND_WHITE:
+                        fill(cell.isAlive ? 'white' : 'black');
+                        break;
+
+                    case COLOR_MODE.COLOR:
+                        fill(cellColor);
+                        break;
+
+                    case COLOR_MODE.HEATMAP:
+                        // Find right color in scale
+                        const colorMap = map(
+                            cellOccurence,
+                            0, this.maxCellOcurrence,
+                            0, 1
+                        );
+
+                        fill(
+                            HEATMAP_SCALE(colorMap).hex()
+                        );
+
+                        break;
                 }
 
                 rect(
@@ -160,16 +192,20 @@ class Universe {
             const aliveNeighbours = this.getCell(x, y).getLiveNeighboursCount(this);
             const color = cell.color;
             const aliveNeighboursColors = cell.getLiveNeighboursColors();
+            const occurence = cell.occurence;
 
             // Next cell state
             let nextState;
             if (alive) {
                 // Any live cell with two or three live neighbours survives
                 nextState = (aliveNeighbours == 2 || aliveNeighbours == 3);
+
             } else {
                 // Any dead cell with three live neighbours becomes a live cell
-                nextState = (aliveNeighbours == 3)
+                nextState = (aliveNeighbours == 3);
             }
+
+            let nextOccurence = nextState ? occurence + 1 : occurence;
 
             // Next cell color
             let nextColor;
@@ -189,12 +225,15 @@ class Universe {
             }
 
             // Create next generation cell
-            nextGen.push(new Cell(this, x, y, nextState, nextColor))
+            nextGen.push(new Cell(this, x, y, nextState, nextColor, nextOccurence))
         });
 
         // Save next generation
         this.cells = nextGen;
         this.generation++;
+
+        // Get the maximum occurence of a cell
+        this.maxCellOcurrence = this.getMaxCellOccurence();
     }
 
     clear() {
@@ -212,7 +251,8 @@ class Universe {
                 this.cells.push(
                     new Cell(
                         this, x, y, isAlive,
-                        isAlive ? COLOR_SCALE(Math.random()).hex() : chroma('black').hex()
+                        isAlive ? COLOR_SCALE(Math.random()).hex() : chroma('black').hex(),
+                        isAlive ? 1 : 0
                     )
                 );
             }
@@ -242,7 +282,17 @@ class Universe {
 
     // Does not take into accoutn modification due to mouse presses
     getStateTitle() {
+
         return 'S' + this.id + 'G' + this.generation + 'C' + (isColored ? '1' : '0');
+    }
+
+    getMaxCellOccurence() {
+        let occ = 0;
+        this.cells.forEach(cell => {
+            occ = max(occ, cell.occurence);
+        });
+
+        return occ;
     }
 }
 
@@ -251,12 +301,13 @@ class Universe {
 /* ############ */
 
 class Cell {
-    constructor(universe, x, y, isAlive, color) {
+    constructor(universe, x, y, isAlive, color, occurence) {
         this.universe = universe;
         this.x = x;
         this.y = y;
         this.isAlive = isAlive;
         this.color = color;
+        this.occurence = occurence;
 
         // Assign neighbours indices
         const leftX = (this.x - 1 + this.universe.dimX) % this.universe.dimX;
