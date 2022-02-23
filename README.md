@@ -2,23 +2,14 @@
 
 <!-- PROJECT SHIELDS -->
 
-<div align="right">
-    <a href="https://developer.mozilla.org/fr/docs/Web/JavaScript">
-        <img src="https://badges.aleen42.com/src/javascript.svg">
-    </a>
-    <a href="https://choosealicense.com/licenses/mit/">
-    	<img src="https://img.shields.io/badge/License-MIT-yellow.svg">
-    </a>
-    <a href="https://lgtm.com/projects/g/Eccsx/AIiCG/alerts/">
-    	<img src="https://img.shields.io/lgtm/alerts/g/Eccsx/AIiCG.svg?logo=lgtm&logoWidth=18">
-    </a>
-    <a href="https://lgtm.com/projects/g/Eccsx/AIiCG/context:javascript">
-    	<img src="https://img.shields.io/lgtm/grade/javascript/g/Eccsx/AIiCG.svg?logo=lgtm&logoWidth=18">
-    </a>
-</div>
-
+[![javascript](https://badges.aleen42.com/src/javascript.svg)](https://developer.mozilla.org/fr/docs/Web/JavaScript)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/Eccsx/AIiCG.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Eccsx/AIiCG/alerts/)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/Eccsx/AIiCG.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Eccsx/AIiCG/context:javascript)
 
 <!-- PROJECT LOGO -->
+
+<br />
 
 <div align="center">
     <a href="https://github.com/Eccsx/AIiCG">
@@ -31,6 +22,7 @@
         <a href="https://eccsx.github.io/AIiCG/">View</a>
     </p>
 </div>
+
 
 
 <!-- ABOUT THE PROJECT -->
