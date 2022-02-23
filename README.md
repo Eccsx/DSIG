@@ -2,7 +2,7 @@
 
 <!-- PROJECT SHIELDS -->
 
-<div>
+<div align="right">
     <img src="https://badges.aleen42.com/src/javascript.svg">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg">
 </div>
