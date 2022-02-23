@@ -142,8 +142,8 @@ function system(μ, λ, n, startingPoint) {
     // Iteration
     for (let i = 0; i < n; i++) {
         // Get new point
-        xn = p.y + (λ * (1 - 0.05 * p.y * p.y) * p.y) + f(p.x, μ);
-        yn = f(xn, μ) - p.x;
+        const xn = p.y + (λ * (1 - 0.05 * p.y * p.y) * p.y) + f(p.x, μ);
+        const yn = f(xn, μ) - p.x;
 
         // Store and set for next iteration
         p = createVector(xn, yn);
