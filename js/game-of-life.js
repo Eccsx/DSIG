@@ -225,7 +225,7 @@ class Universe {
             }
 
             // Create next generation cell
-            nextGen.push(new Cell(this, x, y, nextState, nextColor, nextOccurence))
+            nextGen.push(new Cell(this, x, y, nextState, nextColor, nextOccurence));
         });
 
         // Save next generation

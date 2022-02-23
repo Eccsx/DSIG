@@ -337,7 +337,7 @@ function plotStatistics() {
     Chart.defaults.color = 'white';
 
     // Fitness
-    const fitnessChart = new Chart(fitnessCanvas.getContext('2d'), {
+    new Chart(fitnessCanvas.getContext('2d'), {
         type: 'line',
         data: {
             labels: [...Array(bestFitnessPerGeneration.length).keys()],
@@ -381,7 +381,7 @@ function plotStatistics() {
     });
 
     // μ
-    const μChart = new Chart(μCanvas.getContext('2d'), {
+    new Chart(μCanvas.getContext('2d'), {
         type: 'line',
         data: {
             labels: [...Array(bestμPerGeneration.length).keys()],
@@ -425,7 +425,7 @@ function plotStatistics() {
     });
 
     // λ
-    const λChart = new Chart(λCanvas.getContext('2d'), {
+    new Chart(λCanvas.getContext('2d'), {
         type: 'line',
         data: {
             labels: [...Array(bestλPerGeneration.length).keys()],
