@@ -282,8 +282,7 @@ class Universe {
 
     // Does not take into accoutn modification due to mouse presses
     getStateTitle() {
-
-        return 'S' + this.id + 'G' + this.generation + 'C' + (isColored ? '1' : '0');
+        return 'S' + this.id + 'G' + this.generation;
     }
 
     getMaxCellOccurence() {
