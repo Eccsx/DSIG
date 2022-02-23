@@ -3,9 +3,20 @@
 <!-- PROJECT SHIELDS -->
 
 <div align="right">
-    <img src="https://badges.aleen42.com/src/javascript.svg">
-    <img src="https://img.shields.io/badge/License-MIT-yellow.svg">
+    <a href="https://developer.mozilla.org/fr/docs/Web/JavaScript">
+        <img src="https://badges.aleen42.com/src/javascript.svg">
+    </a>
+    <a href="https://choosealicense.com/licenses/mit/">
+    	<img src="https://img.shields.io/badge/License-MIT-yellow.svg">
+    </a>
+    <a href="https://lgtm.com/projects/g/Eccsx/AIiCG/alerts/">
+    	<img src="https://img.shields.io/lgtm/alerts/g/Eccsx/AIiCG.svg?logo=lgtm&logoWidth=18">
+    </a>
+    <a href="https://lgtm.com/projects/g/Eccsx/AIiCG/context:javascript">
+    	<img src="https://img.shields.io/lgtm/grade/javascript/g/Eccsx/AIiCG.svg?logo=lgtm&logoWidth=18">
+    </a>
 </div>
+
 
 <!-- PROJECT LOGO -->
 
