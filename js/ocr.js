@@ -59,7 +59,7 @@ const CHART_COLORS = [
     '#a0c4ff',
     '#bdb2ff',
     '#ffc6ff'
-]
+];
 
 /* ###################### */
 /* ### User Interface ### */
