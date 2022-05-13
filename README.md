@@ -24,7 +24,6 @@
 </div>
 
 
-
 <!-- ABOUT THE PROJECT -->
 
 ## About
@@ -121,7 +120,7 @@ The version I choose to implement is different from the 'classic' because the 'w
 
 You can add/remove a cell by clicking on it, and use key actions to allow more interactions:
 
-- <kbd>P</kbd> ⇨ play/pause
+- <kbd>p</kbd> ⇨ play/pause
 - <kbd>+</kbd> ⇨ increase speed 
 - <kbd>-</kbd> ⇨ decrease speed
 - <kbd>d</kbd> ⇨ clear cells 
@@ -151,3 +150,4 @@ I also provided two other 'mode' to the Game of Life:
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <p align="right"><a href="#top"><i>back to top</i></a></p>
+
