@@ -12,7 +12,7 @@
 <br />
 
 <div align="center">
-    <a href="https://github.com/Eccsx/AIiCG">
+    <a href="https://github.com/Luunynliny/AIiCG">
         <img src="img/univ.png" alt="Logo" height="80">
     </a>
     <h3 align="center">Artificial Intelligence in Computer Graphics</h3>
