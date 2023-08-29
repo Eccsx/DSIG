@@ -19,7 +19,7 @@
     <p align="center">
         Class projects
         <br />
-        <a href="https://eccsx.github.io/AIiCG/">View</a>
+        <a href="https://luunynliny.github.io/AIiCG/">View</a>
     </p>
 </div>
 
